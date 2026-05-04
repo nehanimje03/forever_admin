@@ -24,6 +24,6 @@ export const useLogin = () => {
 
   return {
     ...mutation,
-    isLoading: mutation.isPending, // optional alias
+    isLoading: mutation.isPending,
   };
 };

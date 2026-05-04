@@ -21,7 +21,7 @@ const Login = () => {
       {
         onSuccess: (data) => {
           if (data) {
-            setToken(data);
+            setToken(data.access_token);
             router.push("/");
           }
         },
@@ -37,12 +37,13 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center w-full">
       <div className="bg-white shadow-md rounded-lg px-8 py-6 w-full max-w-sm">
         {" "}
-        <h1 className="text-2xl font-bold mb-4">Admin Panel</h1>
+        <h1 className="text-2xl font-bold mb-4 ">Admin Panel</h1>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <p className="text-sm font-medium mb-2">Email Address</p>
             <input
               className="w-full px-3 py-2 border rounded-md"
+              placeholder="Enter Email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -54,6 +55,7 @@ const Login = () => {
             <p className="text-sm font-medium mb-2">Password</p>
             <input
               className="w-full px-3 py-2 border rounded-md"
+              placeholder="Enter password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
