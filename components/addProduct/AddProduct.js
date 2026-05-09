@@ -7,7 +7,6 @@ import AddSubCategoryModal from "./AdddSubCategoryModel";
 
 const AddProduct = () => {
   const { mutate, isPending } = useAddProduct();
-
   const [images, setImages] = useState([null, null, null, null]);
   const [previewImages, setPreviewImages] = useState([null, null, null, null]);
   const [name, setName] = useState("");
@@ -21,25 +20,31 @@ const AddProduct = () => {
     "Bottomwear",
     "Winterwear",
   ]);
+
   const [subCategory, setSubCategory] = useState("Topwear");
   const [showSubModal, setShowSubModal] = useState(false);
   const [price, setPrice] = useState("");
-  const [comparePrice, setComparePrice] = useState("");
+  const [discountPercentage, setDiscountPercentage] = useState("");
   const [stock, setStock] = useState("");
   const [sizes, setSizes] = useState([]);
   const [bestseller, setBestseller] = useState(false);
   const [latestArrival, setLatestArrival] = useState(false);
 
+  const finalPrice =
+    price && discountPercentage
+      ? (
+          Number(price) -
+          (Number(price) * Number(discountPercentage)) / 100
+        ).toFixed(2)
+      : price;
+
   const handleImageChange = (e, index) => {
     const file = e.target.files[0];
     if (!file) return;
-
     const newImages = [...images];
     const newPreviews = [...previewImages];
-
     newImages[index] = file;
     newPreviews[index] = URL.createObjectURL(file);
-
     setImages(newImages);
     setPreviewImages(newPreviews);
   };
@@ -71,7 +76,7 @@ const AddProduct = () => {
     }
 
     const numericPrice = Number(price);
-    const numericCompare = Number(comparePrice);
+    const numericDiscount = Number(discountPercentage);
     const numericStock = Number(stock);
 
     if (!numericPrice || numericPrice <= 0) {
@@ -79,8 +84,8 @@ const AddProduct = () => {
       return;
     }
 
-    if (numericCompare && numericCompare <= numericPrice) {
-      alert("Original price must be greater than discount price");
+    if (numericDiscount < 0 || numericDiscount > 100) {
+      alert("Discount percentage must be between 0 and 100");
       return;
     }
 
@@ -99,9 +104,10 @@ const AddProduct = () => {
     formData.append("name", name);
     formData.append("description", description);
     formData.append("category", category);
-    formData.append("sub_category", subCategory);
+    formData.append("subcategory", subCategory);
     formData.append("price", numericPrice);
-    formData.append("compare_price", numericCompare || numericPrice);
+    formData.append("discount_percentage", numericDiscount || 0);
+    formData.append("final_price", finalPrice || numericPrice);
     formData.append("stock", numericStock);
     formData.append("is_bestseller", bestseller ? "True" : "False");
     formData.append("is_latest_arrival", latestArrival ? "True" : "False");
@@ -117,7 +123,7 @@ const AddProduct = () => {
         setName("");
         setDescription("");
         setPrice("");
-        setComparePrice("");
+        setDiscountPercentage("");
         setStock("");
         setImages([null, null, null, null]);
         setPreviewImages([null, null, null, null]);
@@ -136,6 +142,7 @@ const AddProduct = () => {
       >
         <div>
           <p className="mb-2 font-medium">Upload Image</p>
+
           <div className="flex gap-3">
             {[1, 2, 3, 4].map((item, index) => (
               <label
@@ -152,6 +159,7 @@ const AddProduct = () => {
                 ) : (
                   <>
                     <RiUploadCloudFill className="text-xl text-gray-400" />
+
                     <span className="text-gray-400 text-xs">Upload</span>
                   </>
                 )}
@@ -170,6 +178,7 @@ const AddProduct = () => {
 
         <div>
           <p className="mb-2 font-medium">Product name</p>
+
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -182,6 +191,7 @@ const AddProduct = () => {
 
         <div>
           <p className="mb-2 font-medium">Product description</p>
+
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -191,84 +201,128 @@ const AddProduct = () => {
           />
         </div>
 
-        <div className="flex flex-wrap gap-3">
-          <select
-            value={category}
-            onChange={(e) => {
-              if (e.target.value === "ADD_NEW") {
-                setShowModal(true);
-              } else {
-                setCategory(e.target.value);
-              }
-            }}
-            className="px-3 py-2 w-40 border border-gray-300 rounded"
-          >
-            {categories.map((cat) => (
-              <option
-                key={cat}
-                value={cat}
-              >
-                {cat}
-              </option>
-            ))}
-            <option value="ADD_NEW">➕ Add New Category</option>
-          </select>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="flex flex-col">
+            <label className="mb-2 font-medium text-sm text-gray-700">
+              Category
+            </label>
 
-          <select
-            value={subCategory}
-            onChange={(e) => {
-              if (e.target.value === "ADD_NEW") {
-                setShowSubModal(true);
-              } else {
-                setSubCategory(e.target.value);
-              }
-            }}
-            className="px-3 py-2 w-40 border border-gray-300 rounded"
-          >
-            {subCategories.map((sub) => (
-              <option
-                key={sub}
-                value={sub}
-              >
-                {sub}
-              </option>
-            ))}
-            <option value="ADD_NEW">➕ Add Subcategory</option>
-          </select>
+            <select
+              value={category}
+              onChange={(e) => {
+                if (e.target.value === "ADD_NEW") {
+                  setShowModal(true);
+                } else {
+                  setCategory(e.target.value);
+                }
+              }}
+              className="h-12 px-3 border border-gray-300 rounded-md outline-none focus:border-black"
+            >
+              {categories.map((cat) => (
+                <option
+                  key={cat}
+                  value={cat}
+                >
+                  {cat}
+                </option>
+              ))}
 
-          <input
-            value={comparePrice}
-            onChange={(e) => setComparePrice(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded w-33"
-            placeholder="Original Price"
-            type="number"
-            min="0"
-          />
+              <option value="ADD_NEW">➕ Add New Category</option>
+            </select>
+          </div>
 
-          <input
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded w-33"
-            placeholder="Discount Price"
-            type="number"
-            min="0"
-            step="0.01"
-            required
-          />
+          <div className="flex flex-col">
+            <label className="mb-2 font-medium text-sm text-gray-700">
+              Subcategory
+            </label>
 
-          <input
-            value={stock}
-            onChange={(e) => setStock(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded w-33"
-            placeholder="Stock"
-            type="number"
-            min="0"
-            required
-          />
+            <select
+              value={subCategory}
+              onChange={(e) => {
+                if (e.target.value === "ADD_NEW") {
+                  setShowSubModal(true);
+                } else {
+                  setSubCategory(e.target.value);
+                }
+              }}
+              className="h-12 px-3 border border-gray-300 rounded-md outline-none focus:border-black"
+            >
+              {subCategories.map((sub) => (
+                <option
+                  key={sub}
+                  value={sub}
+                >
+                  {sub}
+                </option>
+              ))}
+
+              <option value="ADD_NEW">➕ Add Subcategory</option>
+            </select>
+          </div>
+
+          <div className="flex flex-col">
+            <label className="mb-2 font-medium text-sm text-gray-700">
+              Stock
+            </label>
+
+            <input
+              value={stock}
+              onChange={(e) => setStock(e.target.value)}
+              className="h-12 px-3 border border-gray-300 rounded-md outline-none focus:border-black"
+              placeholder="Enter Stock"
+              type="number"
+              min="0"
+              required
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label className="mb-2 font-medium text-sm text-gray-700">
+              Actual Price
+            </label>
+
+            <input
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              className="h-12 px-3 border border-gray-300 rounded-md outline-none focus:border-black"
+              placeholder="Enter Price"
+              type="number"
+              min="0"
+              step="0.01"
+              required
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <div className="flex flex-col">
+              <label className="mb-2 font-medium text-sm text-gray-700">
+                Discount %
+              </label>
+
+              <input
+                value={discountPercentage}
+                onChange={(e) => setDiscountPercentage(e.target.value)}
+                className="h-12 px-3 border border-gray-300 rounded-md outline-none focus:border-black"
+                placeholder="Enter Discount"
+                type="number"
+                min="0"
+                max="100"
+              />
+            </div>
+            <div>
+              <p className="text-[12px] pt-1 text-red-600">
+                Final Amount:
+                <span className="font-semibold text-red-600 ml-2">
+                  ₹{finalPrice || 0}
+                </span>
+              </p>
+            </div>
+          </div>
         </div>
 
         <div>
           <p className="mb-2 font-medium">Product Sizes</p>
+
           <div className="flex gap-2">
             {["S", "M", "L", "XL", "XXL"].map((size) => (
               <button
@@ -308,7 +362,7 @@ const AddProduct = () => {
         <button
           type="submit"
           disabled={isPending}
-          className="w-32 py-3 bg-black text-white mt-4 disabled:opacity-50"
+          className="w-38 py-2 bg-black text-white mt-4 disabled:opacity-50 rounded-lg"
         >
           {isPending ? "Adding..." : "ADD"}
         </button>

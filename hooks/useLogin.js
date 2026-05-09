@@ -12,7 +12,6 @@ export const useLogin = () => {
     onSuccess: (data) => {
       console.log("Login success:", data);
       toast.success("Login successfully");
-
       Cookies.set("token", data.access_token);
     },
 

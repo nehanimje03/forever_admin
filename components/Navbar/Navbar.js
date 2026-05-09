@@ -34,7 +34,7 @@ const Navbar = () => {
 
         <button
           onClick={() => setOpen(true)}
-          className="bg-gray-600 text-white px-5 py-2 sm:px-7 rounded-full text-xs sm:text-sm cursor-pointer"
+          className="bg-gray-600 text-white px-5 py-2 sm:px-7 rounded-lg text-xs sm:text-sm cursor-pointer"
         >
           Logout
         </button>

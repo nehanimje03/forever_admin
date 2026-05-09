@@ -2,17 +2,15 @@
 
 import React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation"; // ✅ important
+import { usePathname } from "next/navigation";
 import { PlusSquare, List, ShoppingCart } from "lucide-react";
 
 const Sidebar = () => {
-  const pathname = usePathname(); // current route
+  const pathname = usePathname();
 
   const linkClass = (path) =>
     `flex items-center gap-3 border border-gray-300 border-r-0 px-3 py-2 rounded-l transition ${
-      pathname === path
-        ? "bg-pink-100 border-pink-400" // ✅ active style
-        : "hover:bg-gray-100"
+      pathname === path ? "bg-pink-100 border-pink-400" : "hover:bg-gray-100"
     }`;
 
   return (
