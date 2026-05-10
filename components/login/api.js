@@ -1,4 +1,3 @@
-// api/auth.js
 export const loginUser = async ({ email, password }) => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/custom-admin/admin/login/`,

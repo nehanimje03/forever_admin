@@ -1,21 +1,34 @@
 "use client";
 
-import { X } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { RiUploadCloudFill } from "react-icons/ri";
-import { useUpdateProduct } from "../../hooks/useUpdateProducts";
+import { UploadCloud } from "lucide-react";
 import { toast } from "react-toastify";
+import { useUpdateProduct } from "../../hooks/useUpdateProducts";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const EditProductModal = ({ isOpen, onClose, product }) => {
   const { mutate, isPending } = useUpdateProduct();
-
   const [images, setImages] = useState([null, null, null, null]);
   const [previewImages, setPreviewImages] = useState([null, null, null, null]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [categories] = useState(["Men", "Women", "Kids"]);
   const [category, setCategory] = useState("Men");
-  const [subCategories] = useState(["Topwear", "Bottomwear", "Winterwear"]);
   const [subCategory, setSubCategory] = useState("Topwear");
   const [price, setPrice] = useState("");
   const [discountPercentage, setDiscountPercentage] = useState("");
@@ -23,6 +36,8 @@ const EditProductModal = ({ isOpen, onClose, product }) => {
   const [sizes, setSizes] = useState([]);
   const [bestseller, setBestseller] = useState(false);
   const [latestArrival, setLatestArrival] = useState(false);
+  const categories = ["Men", "Women", "Kids"];
+  const subCategories = ["Topwear", "Bottomwear", "Winterwear"];
 
   const finalPrice =
     price && discountPercentage
@@ -44,7 +59,6 @@ const EditProductModal = ({ isOpen, onClose, product }) => {
       setSizes(product?.sizes || []);
       setBestseller(product?.is_bestseller || false);
       setLatestArrival(product?.is_latest_arrival || false);
-
       setPreviewImages([
         product?.product_image || product?.image || null,
         null,
@@ -54,12 +68,9 @@ const EditProductModal = ({ isOpen, onClose, product }) => {
     }
   }, [product]);
 
-  if (!isOpen) return null;
-
   const handleImageChange = (e, index) => {
     const file = e.target.files[0];
     if (!file) return;
-
     const updatedImages = [...images];
     const updatedPreviews = [...previewImages];
     updatedImages[index] = file;
@@ -78,9 +89,7 @@ const EditProductModal = ({ isOpen, onClose, product }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const formData = new FormData();
-
     formData.append("name", name);
     formData.append("description", description);
     formData.append("category", category);
@@ -107,6 +116,7 @@ const EditProductModal = ({ isOpen, onClose, product }) => {
       {
         onSuccess: () => {
           toast.success("Product updated successfully");
+
           onClose();
         },
       },
@@ -114,50 +124,47 @@ const EditProductModal = ({ isOpen, onClose, product }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
-      <div className="bg-white p-6 w-175 max-h-[90vh] overflow-y-auto rounded-lg">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">Edit Product</h2>
-
-          <button
-            onClick={onClose}
-            className="text-red-500 cursor-pointer"
-          >
-            <X />
-          </button>
-        </div>
+    <Dialog
+      open={isOpen}
+      onOpenChange={onClose}
+    >
+      <DialogContent className="w-[50vw]! max-w-5xl! max-h-[90vh] overflow-y-auto rounded-2xl p-0">
+        {" "}
+        <DialogHeader className="border-b px-8 py-5">
+          <DialogTitle className="text-3xl font-bold">Edit Product</DialogTitle>
+        </DialogHeader>
 
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col gap-5 text-gray-700"
+          className="space-y-8 p-8"
         >
-          <div>
-            <p className="mb-2 font-medium">Upload Image</p>
+          <div className="space-y-4">
+            <Label className="text-base font-semibold">Upload Images</Label>
 
-            <div className="flex gap-3">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-4">
               {[1, 2, 3, 4].map((item, index) => (
                 <label
                   key={item}
                   htmlFor={`edit-image-${item}`}
-                  className="w-20 h-20 border border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer rounded-md overflow-hidden"
+                  className="h-36 w-full cursor-pointer overflow-hidden rounded-2xl border border-dashed bg-muted transition hover:bg-muted/80"
                 >
                   {previewImages[index] ? (
                     <img
                       src={previewImages[index]}
                       alt="preview"
-                      className="w-full h-full object-cover"
+                      className="h-full w-full object-contain"
                     />
                   ) : (
-                    <>
-                      <RiUploadCloudFill className="text-xl text-gray-400" />
+                    <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-muted-foreground">
+                      <UploadCloud className="h-6 w-6" />
 
-                      <span className="text-gray-400 text-xs">Upload</span>
-                    </>
+                      <span className="text-sm">Upload</span>
+                    </div>
                   )}
 
                   <input
-                    id={`edit-image-${item}`}
                     hidden
+                    id={`edit-image-${item}`}
                     type="file"
                     accept="image/*"
                     onChange={(e) => handleImageChange(e, index)}
@@ -167,158 +174,182 @@ const EditProductModal = ({ isOpen, onClose, product }) => {
             </div>
           </div>
 
-          <div>
-            <p className="mb-2 font-medium">Product Name</p>
+          <div className="space-y-3">
+            <Label className="text-base font-semibold">Product Name</Label>
 
-            <input
+            <Input
+              className="h-11"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded"
-              placeholder="Type here"
-              type="text"
+              placeholder="Enter product name"
             />
           </div>
 
-          <div>
-            <p className="mb-2 font-medium">Product Description</p>
+          <div className="space-y-3">
+            <Label className="text-base font-semibold">Description</Label>
 
-            <textarea
+            <Textarea
+              className="min-h-30"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded resize-none"
-              placeholder="Write content here"
+              placeholder="Write product description"
             />
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <div>
-              <p className="mb-2 font-medium">Category</p>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">Category</Label>
 
-              <select
+              <Select
                 value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded"
+                onValueChange={setCategory}
               >
-                {categories.map((cat) => (
-                  <option
-                    key={cat}
-                    value={cat}
-                  >
-                    {cat}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="h-11">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {categories.map((cat) => (
+                    <SelectItem
+                      key={cat}
+                      value={cat}
+                    >
+                      {cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            <div>
-              <p className="mb-2 font-medium">Subcategory</p>
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">Subcategory</Label>
 
-              <select
+              <Select
                 value={subCategory}
-                onChange={(e) => setSubCategory(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded"
+                onValueChange={setSubCategory}
               >
-                {subCategories.map((sub) => (
-                  <option
-                    key={sub}
-                    value={sub}
-                  >
-                    {sub}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="h-11">
+                  <SelectValue placeholder="Select subcategory" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {subCategories.map((sub) => (
+                    <SelectItem
+                      key={sub}
+                      value={sub}
+                    >
+                      {sub}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            <div>
-              <p className="mb-2 font-medium">Actual Price</p>
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">Price</Label>
 
-              <input
+              <Input
+                className="h-11"
+                type="number"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded"
                 placeholder="Price"
-                type="number"
               />
             </div>
 
-            <div>
-              <p className="mb-2 font-medium">Discount %</p>
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">Discount %</Label>
 
-              <input
+              <Input
+                className="h-11"
+                type="number"
                 value={discountPercentage}
                 onChange={(e) => setDiscountPercentage(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded"
-                placeholder="Discount %"
-                type="number"
+                placeholder="Discount"
               />
 
-              <p className="text-xs text-red-500 mt-1">
-                Final: ₹{finalPrice || 0}
+              <p className="text-sm text-muted-foreground">
+                Final Price:{" "}
+                <span className="font-semibold text-black">
+                  ₹{finalPrice || 0}
+                </span>
               </p>
             </div>
 
-            <div>
-              <p className="mb-2 font-medium">Stock</p>
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">Stock</Label>
 
-              <input
+              <Input
+                className="h-11"
+                type="number"
                 value={stock}
                 onChange={(e) => setStock(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded"
                 placeholder="Stock"
-                type="number"
               />
             </div>
           </div>
 
-          <div>
-            <p className="mb-2 font-medium">Product Sizes</p>
+          <div className="space-y-4">
+            <Label className="text-base font-semibold">Available Sizes</Label>
 
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-3">
               {["S", "M", "L", "XL", "XXL"].map((size) => (
-                <button
+                <Button
                   type="button"
                   key={size}
+                  variant={sizes.includes(size) ? "default" : "outline"}
+                  className="rounded-xl px-5"
                   onClick={() => toggleSize(size)}
-                  className={`px-3 py-1 rounded ${
-                    sizes.includes(size) ? "bg-black text-white" : "bg-gray-200"
-                  }`}
                 >
                   {size}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
 
-          <div className="flex gap-6">
-            <label className="flex items-center gap-2">
+          <div className="flex flex-wrap gap-8">
+            <label className="flex items-center gap-3 text-sm font-medium">
               <input
                 type="checkbox"
                 checked={bestseller}
                 onChange={() => setBestseller(!bestseller)}
+                className="h-4 w-4"
               />
               Bestseller
             </label>
 
-            <label className="flex items-center gap-2">
+            <label className="flex items-center gap-3 text-sm font-medium">
               <input
                 type="checkbox"
                 checked={latestArrival}
                 onChange={() => setLatestArrival(!latestArrival)}
+                className="h-4 w-4"
               />
               Latest Arrival
             </label>
           </div>
 
-          <button
-            type="submit"
-            disabled={isPending}
-            className="w-40 py-3 bg-black text-white mt-4 disabled:opacity-50 mx-auto rounded"
-          >
-            {isPending ? "Updating..." : "Update"}
-          </button>
+          <div className="flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="h-11 px-6"
+            >
+              Cancel
+            </Button>
+
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="h-11 px-6"
+            >
+              {isPending ? "Updating..." : "Update Product"}
+            </Button>
+          </div>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

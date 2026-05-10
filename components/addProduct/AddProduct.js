@@ -1,18 +1,46 @@
 "use client";
+
 import React, { useState } from "react";
+
 import { useAddProduct } from "../../hooks/useAddProduct";
+
 import { RiUploadCloudFill } from "react-icons/ri";
+
 import AddCategoryModal from "./AddCategoryModel";
+
 import AddSubCategoryModal from "./AdddSubCategoryModel";
+
+import { Input } from "@/components/ui/input";
+
+import { Textarea } from "@/components/ui/textarea";
+
+import { Button } from "@/components/ui/button";
+
+import { Checkbox } from "@/components/ui/checkbox";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const AddProduct = () => {
   const { mutate, isPending } = useAddProduct();
+
   const [images, setImages] = useState([null, null, null, null]);
+
   const [previewImages, setPreviewImages] = useState([null, null, null, null]);
+
   const [name, setName] = useState("");
+
   const [description, setDescription] = useState("");
+
   const [categories, setCategories] = useState(["Men", "Women", "Kids"]);
+
   const [category, setCategory] = useState("Men");
+
   const [showModal, setShowModal] = useState(false);
 
   const [subCategories, setSubCategories] = useState([
@@ -22,12 +50,19 @@ const AddProduct = () => {
   ]);
 
   const [subCategory, setSubCategory] = useState("Topwear");
+
   const [showSubModal, setShowSubModal] = useState(false);
+
   const [price, setPrice] = useState("");
+
   const [discountPercentage, setDiscountPercentage] = useState("");
+
   const [stock, setStock] = useState("");
+
   const [sizes, setSizes] = useState([]);
+
   const [bestseller, setBestseller] = useState(false);
+
   const [latestArrival, setLatestArrival] = useState(false);
 
   const finalPrice =
@@ -40,12 +75,19 @@ const AddProduct = () => {
 
   const handleImageChange = (e, index) => {
     const file = e.target.files[0];
+
     if (!file) return;
+
     const newImages = [...images];
+
     const newPreviews = [...previewImages];
+
     newImages[index] = file;
+
     newPreviews[index] = URL.createObjectURL(file);
+
     setImages(newImages);
+
     setPreviewImages(newPreviews);
   };
 
@@ -59,11 +101,13 @@ const AddProduct = () => {
 
   const handleAddCategory = (newCat) => {
     setCategories((prev) => [...prev, newCat]);
+
     setCategory(newCat);
   };
 
   const handleAddSubCategory = (newSub) => {
     setSubCategories((prev) => [...prev, newSub]);
+
     setSubCategory(newSub);
   };
 
@@ -72,45 +116,63 @@ const AddProduct = () => {
 
     if (!name.trim()) {
       alert("Enter product name");
+
       return;
     }
 
     const numericPrice = Number(price);
+
     const numericDiscount = Number(discountPercentage);
+
     const numericStock = Number(stock);
 
     if (!numericPrice || numericPrice <= 0) {
       alert("Enter valid price");
+
       return;
     }
 
     if (numericDiscount < 0 || numericDiscount > 100) {
       alert("Discount percentage must be between 0 and 100");
+
       return;
     }
 
     if (numericStock < 0) {
       alert("Stock cannot be negative");
+
       return;
     }
 
     if (!images.some((img) => img !== null)) {
       alert("Upload at least one image");
+
       return;
     }
 
     const formData = new FormData();
 
     formData.append("name", name);
+
     formData.append("description", description);
+
     formData.append("category", category);
+
     formData.append("subcategory", subCategory);
+
     formData.append("price", numericPrice);
+
     formData.append("discount_percentage", numericDiscount || 0);
+
     formData.append("final_price", finalPrice || numericPrice);
+
     formData.append("stock", numericStock);
+
     formData.append("is_bestseller", bestseller ? "True" : "False");
+
     formData.append("is_latest_arrival", latestArrival ? "True" : "False");
+
+    formData.append("sizes", JSON.stringify(sizes));
 
     images.forEach((img) => {
       if (img) {
@@ -121,14 +183,23 @@ const AddProduct = () => {
     mutate(formData, {
       onSuccess: () => {
         setName("");
+
         setDescription("");
+
         setPrice("");
+
         setDiscountPercentage("");
+
         setStock("");
+
         setImages([null, null, null, null]);
+
         setPreviewImages([null, null, null, null]);
+
         setSizes([]);
+
         setBestseller(false);
+
         setLatestArrival(false);
       },
     });
@@ -138,8 +209,9 @@ const AddProduct = () => {
     <>
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-3xl flex flex-col gap-5 text-gray-700"
+        className="w-full max-w-3xl p-6 flex flex-col gap-5 text-gray-700"
       >
+        {/* IMAGE */}
         <div>
           <p className="mb-2 font-medium">Upload Image</p>
 
@@ -176,10 +248,11 @@ const AddProduct = () => {
           </div>
         </div>
 
+        {/* PRODUCT NAME */}
         <div>
           <p className="mb-2 font-medium">Product name</p>
 
-          <input
+          <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded"
@@ -189,10 +262,11 @@ const AddProduct = () => {
           />
         </div>
 
+        {/* DESCRIPTION */}
         <div>
           <p className="mb-2 font-medium">Product description</p>
 
-          <textarea
+          <Textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded resize-none"
@@ -201,74 +275,88 @@ const AddProduct = () => {
           />
         </div>
 
+        {/* GRID */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {/* CATEGORY */}
           <div className="flex flex-col">
             <label className="mb-2 font-medium text-sm text-gray-700">
               Category
             </label>
 
-            <select
+            <Select
               value={category}
-              onChange={(e) => {
-                if (e.target.value === "ADD_NEW") {
+              onValueChange={(value) => {
+                if (value === "ADD_NEW") {
                   setShowModal(true);
                 } else {
-                  setCategory(e.target.value);
+                  setCategory(value);
                 }
               }}
-              className="h-12 px-3 border border-gray-300 rounded-md outline-none focus:border-black"
             >
-              {categories.map((cat) => (
-                <option
-                  key={cat}
-                  value={cat}
-                >
-                  {cat}
-                </option>
-              ))}
+              <SelectTrigger className="h-12 px-3 w-full border border-gray-300 rounded-md">
+                <SelectValue placeholder="Select Category" />
+              </SelectTrigger>
 
-              <option value="ADD_NEW">➕ Add New Category</option>
-            </select>
+              <SelectContent>
+                {categories.map((cat) => (
+                  <SelectItem
+                    key={cat}
+                    value={cat}
+                  >
+                    {cat}
+                  </SelectItem>
+                ))}
+
+                <SelectItem value="ADD_NEW">➕ Add New Category</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
+          {/* SUBCATEGORY */}
           <div className="flex flex-col">
             <label className="mb-2 font-medium text-sm text-gray-700">
               Subcategory
             </label>
 
-            <select
+            <Select
               value={subCategory}
-              onChange={(e) => {
-                if (e.target.value === "ADD_NEW") {
+              onValueChange={(value) => {
+                if (value === "ADD_NEW") {
                   setShowSubModal(true);
                 } else {
-                  setSubCategory(e.target.value);
+                  setSubCategory(value);
                 }
               }}
-              className="h-12 px-3 border border-gray-300 rounded-md outline-none focus:border-black"
             >
-              {subCategories.map((sub) => (
-                <option
-                  key={sub}
-                  value={sub}
-                >
-                  {sub}
-                </option>
-              ))}
+              <SelectTrigger className="h-12 px-3 w-full border border-gray-300 rounded-md">
+                <SelectValue placeholder="Select Subcategory" />
+              </SelectTrigger>
 
-              <option value="ADD_NEW">➕ Add Subcategory</option>
-            </select>
+              <SelectContent>
+                {subCategories.map((sub) => (
+                  <SelectItem
+                    key={sub}
+                    value={sub}
+                  >
+                    {sub}
+                  </SelectItem>
+                ))}
+
+                <SelectItem value="ADD_NEW">➕ Add Subcategory</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
+          {/* STOCK */}
           <div className="flex flex-col">
             <label className="mb-2 font-medium text-sm text-gray-700">
               Stock
             </label>
 
-            <input
+            <Input
               value={stock}
               onChange={(e) => setStock(e.target.value)}
-              className="h-12 px-3 border border-gray-300 rounded-md outline-none focus:border-black"
+              className="py-2 px-3 border border-gray-300 rounded-md"
               placeholder="Enter Stock"
               type="number"
               min="0"
@@ -276,15 +364,16 @@ const AddProduct = () => {
             />
           </div>
 
+          {/* PRICE */}
           <div className="flex flex-col">
             <label className="mb-2 font-medium text-sm text-gray-700">
               Actual Price
             </label>
 
-            <input
+            <Input
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="h-12 px-3 border border-gray-300 rounded-md outline-none focus:border-black"
+              className="py-2 px-3 border border-gray-300 rounded-md"
               placeholder="Enter Price"
               type="number"
               min="0"
@@ -293,22 +382,24 @@ const AddProduct = () => {
             />
           </div>
 
+          {/* DISCOUNT */}
           <div className="flex flex-col">
             <div className="flex flex-col">
               <label className="mb-2 font-medium text-sm text-gray-700">
                 Discount %
               </label>
 
-              <input
+              <Input
                 value={discountPercentage}
                 onChange={(e) => setDiscountPercentage(e.target.value)}
-                className="h-12 px-3 border border-gray-300 rounded-md outline-none focus:border-black"
+                className="py-2 px-3 border border-gray-300 rounded-md"
                 placeholder="Enter Discount"
                 type="number"
                 min="0"
                 max="100"
               />
             </div>
+
             <div>
               <p className="text-[12px] pt-1 text-red-600">
                 Final Amount:
@@ -320,52 +411,52 @@ const AddProduct = () => {
           </div>
         </div>
 
+        {/* SIZES */}
         <div>
           <p className="mb-2 font-medium">Product Sizes</p>
 
           <div className="flex gap-2">
             {["S", "M", "L", "XL", "XXL"].map((size) => (
-              <button
+              <Button
                 type="button"
                 key={size}
                 onClick={() => toggleSize(size)}
-                className={`px-3 py-1 rounded ${
-                  sizes.includes(size) ? "bg-black text-white" : "bg-gray-200"
-                }`}
+                variant={sizes.includes(size) ? "default" : "secondary"}
+                className="px-3 py-1 rounded"
               >
                 {size}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
 
+        {/* CHECKBOXES */}
         <div className="flex gap-6">
           <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
+            <Checkbox
               checked={bestseller}
-              onChange={() => setBestseller(!bestseller)}
+              onCheckedChange={() => setBestseller(!bestseller)}
             />
             Bestseller
           </label>
 
           <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
+            <Checkbox
               checked={latestArrival}
-              onChange={() => setLatestArrival(!latestArrival)}
+              onCheckedChange={() => setLatestArrival(!latestArrival)}
             />
             Latest Arrival
           </label>
         </div>
 
-        <button
+        {/* BUTTON */}
+        <Button
           type="submit"
           disabled={isPending}
           className="w-38 py-2 bg-black text-white mt-4 disabled:opacity-50 rounded-lg"
         >
           {isPending ? "Adding..." : "ADD"}
-        </button>
+        </Button>
       </form>
 
       <AddCategoryModal

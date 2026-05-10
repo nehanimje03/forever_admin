@@ -1,10 +1,21 @@
 "use client";
+
 import React, { useState } from "react";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
+import { Button } from "@/components/ui/button";
+
+import { Input } from "@/components/ui/input";
 
 const AddCategoryModal = ({ isOpen, onClose, onAdd, categories }) => {
   const [value, setValue] = useState("");
-
-  if (!isOpen) return null;
 
   const handleAdd = () => {
     const trimmed = value.trim();
@@ -17,42 +28,46 @@ const AddCategoryModal = ({ isOpen, onClose, onAdd, categories }) => {
     }
 
     onAdd(trimmed);
+
     setValue("");
+
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg w-80 shadow-lg">
-        <h2 className="text-lg font-semibold mb-4">Add Category</h2>
+    <Dialog
+      open={isOpen}
+      onOpenChange={onClose}
+    >
+      <DialogContent className="sm:max-w-md rounded-2xl">
+        <DialogHeader>
+          <DialogTitle>Add Category</DialogTitle>
+        </DialogHeader>
 
-        <input
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          placeholder="Enter category"
-          className="w-full px-3 py-2 border rounded mb-4"
-        />
+        <div className="py-2">
+          <Input
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="Enter category"
+            className="h-11"
+          />
+        </div>
 
-        <div className="flex justify-end gap-2">
-          <button
+        <DialogFooter className="flex gap-2 sm:justify-end">
+          <Button
+            variant="outline"
             onClick={() => {
               setValue("");
               onClose();
             }}
-            className="px-4 py-2 bg-gray-300 rounded"
           >
             Cancel
-          </button>
+          </Button>
 
-          <button
-            onClick={handleAdd}
-            className="px-4 py-2 bg-black text-white rounded"
-          >
-            Add
-          </button>
-        </div>
-      </div>
-    </div>
+          <Button onClick={handleAdd}>Add</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

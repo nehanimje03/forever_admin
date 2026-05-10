@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,21 +12,20 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-const DeleteModel = ({ isOpen, onClose, onConfirm, isDeleting }) => {
+const LogoutModel = ({ open, setOpen, onConfirm }) => {
   return (
     <AlertDialog
-      open={isOpen}
-      onOpenChange={onClose}
+      open={open}
+      onOpenChange={setOpen}
     >
       <AlertDialogContent className="sm:max-w-md rounded-2xl">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-xl">
-            Delete Product
+            Confirm Logout
           </AlertDialogTitle>
 
           <AlertDialogDescription>
-            Are you sure you want to delete this product? This action cannot be
-            undone.
+            Are you sure you want to logout from your account?
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -36,10 +34,9 @@ const DeleteModel = ({ isOpen, onClose, onConfirm, isDeleting }) => {
 
           <AlertDialogAction
             onClick={onConfirm}
-            disabled={isDeleting}
-            className="rounded-lg bg-black hover:bg-gray-600"
+            className="rounded-lg bg-black hover:bg-gray-800"
           >
-            {isDeleting ? "Deleting..." : "Delete"}
+            Logout
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -47,4 +44,4 @@ const DeleteModel = ({ isOpen, onClose, onConfirm, isDeleting }) => {
   );
 };
 
-export default DeleteModel;
+export default LogoutModel;

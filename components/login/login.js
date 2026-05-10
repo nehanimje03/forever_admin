@@ -8,9 +8,8 @@ import { useLogin } from "../../hooks/useLogin";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const router = useRouter();
-  const { setToken } = useAuthStore();
+  const { setToken, setUser } = useAuthStore();
   const { mutate, isPending } = useLogin();
 
   const handleSubmit = (e) => {
@@ -21,7 +20,9 @@ const Login = () => {
       {
         onSuccess: (data) => {
           if (data) {
+            console.log(data);
             setToken(data.access_token);
+            setUser(data.user);
             router.push("/");
           }
         },
