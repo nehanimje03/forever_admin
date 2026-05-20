@@ -28,6 +28,7 @@ const Login = () => {
             router.push("/");
           }
         },
+        
         onError: (error) => {
           console.error("Login failed:", error.message);
         },
