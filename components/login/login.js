@@ -6,8 +6,10 @@ import { useAuthStore } from "../../zustand/useAuthStore";
 import { useLogin } from "../../hooks/useLogin";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  // default values shown in input
+  const [email, setEmail] = useState("manisha@gmail.com");
+  const [password, setPassword] = useState("manisha");
+
   const router = useRouter();
   const { setToken, setUser } = useAuthStore();
   const { mutate, isPending } = useLogin();
@@ -37,11 +39,12 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center w-full">
       <div className="bg-white shadow-md rounded-lg px-8 py-6 w-full max-w-sm">
-        {" "}
-        <h1 className="text-2xl font-bold mb-4 ">Admin Panel</h1>
+        <h1 className="text-2xl font-bold mb-4">Admin Panel</h1>
+
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <p className="text-sm font-medium mb-2">Email Address</p>
+
             <input
               className="w-full px-3 py-2 border rounded-md"
               placeholder="Enter Email"
@@ -54,9 +57,10 @@ const Login = () => {
 
           <div className="mb-3">
             <p className="text-sm font-medium mb-2">Password</p>
+
             <input
               className="w-full px-3 py-2 border rounded-md"
-              placeholder="Enter password"
+              placeholder="Enter Password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
