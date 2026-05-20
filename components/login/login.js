@@ -34,7 +34,6 @@ const Login = () => {
         },
       },
     );
-    
   };
 
   return (
