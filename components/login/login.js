@@ -7,8 +7,8 @@ import { useLogin } from "../../hooks/useLogin";
 
 const Login = () => {
   // default values shown in input
-  const [email, setEmail] = useState("manisha@gmail.com");
-  const [password, setPassword] = useState("manisha");
+  const [email, setEmail] = useState("admin@gmail.com");
+  const [password, setPassword] = useState("admin");
 
   const router = useRouter();
   const { setToken, setUser } = useAuthStore();
