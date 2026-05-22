@@ -7,12 +7,10 @@ export const useAuthStore = create((set) => ({
 
   token: null,
 
-  // SET USER
   setUser: (user) => {
     set({ user });
   },
 
-  // SET TOKEN
   setToken: (token) => {
     if (token) {
       Cookies.set("token", token);
@@ -21,14 +19,12 @@ export const useAuthStore = create((set) => ({
     set({ token });
   },
 
-  // CLEAR TOKEN
   clearToken: () => {
     Cookies.remove("token");
 
     set({ token: null });
   },
 
-  // LOGOUT
   logout: () => {
     Cookies.remove("token");
 
