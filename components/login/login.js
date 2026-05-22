@@ -6,7 +6,6 @@ import { useAuthStore } from "../../zustand/useAuthStore";
 import { useLogin } from "../../hooks/useLogin";
 
 const Login = () => {
-  // default values shown in input
   const [email, setEmail] = useState("admin@gmail.com");
   const [password, setPassword] = useState("admin");
 
