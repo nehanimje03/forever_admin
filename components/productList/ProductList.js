@@ -36,16 +36,13 @@ const ProductList = () => {
     page_size: 5,
   });
 
-  const products = Array.isArray(data?.data?.results)
-    ? data.data.results
-    : [];
+  const products = Array.isArray(data?.data?.results) ? data.data.results : [];
 
   const totalPages = data?.data?.total_pages || 1;
   const currentPage = data?.data?.current_page || 1;
   const totalItems = data?.data?.total_items || 0;
 
-  const { mutate: deleteMutate, isPending: isDeleting } =
-    useDeleteProduct();
+  const { mutate: deleteMutate, isPending: isDeleting } = useDeleteProduct();
 
   const [showEdit, setShowEdit] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -95,9 +92,7 @@ const ProductList = () => {
             </div>
 
             <div>
-              <CardTitle className="text-2xl font-semibold">
-                Products
-              </CardTitle>
+              <CardTitle className="text-2xl font-semibold">Products</CardTitle>
 
               <p className="text-sm text-muted-foreground">
                 Total Products: {totalItems}
@@ -111,27 +106,27 @@ const ProductList = () => {
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="py-4 pl-6">
-                    Product
-                  </TableHead>
+                  <TableHead className="py-4 pl-6">Product</TableHead>
 
                   <TableHead>Category</TableHead>
-                  <TableHead>Price</TableHead>
+                  <TableHead>MRP</TableHead>
                   <TableHead>Discount</TableHead>
+                  <TableHead>Selling Price</TableHead>
                   <TableHead>Stock</TableHead>
                   <TableHead>Sizes</TableHead>
                   <TableHead>Status</TableHead>
 
-                  <TableHead className="pr-6 text-center">
-                    Actions
-                  </TableHead>
+                  <TableHead className="pr-6 text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>
 
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="h-100">
+                    <TableCell
+                      colSpan={8}
+                      className="h-100"
+                    >
                       <div className="flex h-full w-full items-center justify-center">
                         <div className="flex flex-col items-center gap-4">
                           <div className="h-14 w-14 animate-spin rounded-full border-4 border-gray-200 border-t-black"></div>
@@ -163,6 +158,14 @@ const ProductList = () => {
                       parsedSizes = [];
                     }
 
+                    const mrp = Number(item?.price || 0);
+
+                    const discount = Number(
+                      String(item?.discount_percentage || 0).replace("%", ""),
+                    );
+
+                    const finalPrice = mrp - (mrp * discount) / 100;
+
                     return (
                       <TableRow
                         key={item?.id}
@@ -170,7 +173,7 @@ const ProductList = () => {
                       >
                         <TableCell className="pl-6">
                           <div className="flex items-center gap-4">
-                            <div className="h-16 w-16 overflow-hidden rounded-2xl border border-gray-200 bg-gray-100 shadow-sm">
+                            <div className="h-16 w-14 overflow-hidden rounded border border-gray-200 bg-gray-100 shadow-sm">
                               <img
                                 src={
                                   item?.product_images?.[0]
@@ -178,7 +181,7 @@ const ProductList = () => {
                                     : "/placeholder.png"
                                 }
                                 alt={item?.name || "product"}
-                                className="h-full w-full object-contain"
+                                className="h-full w-full object-cover"
                               />
                             </div>
 
@@ -187,7 +190,7 @@ const ProductList = () => {
                                 {item?.name || "Unnamed Product"}
                               </span>
 
-                              <p className="max-w-55 truncate text-xs text-muted-foreground">
+                              <p className="max-w-35 truncate text-xs text-muted-foreground">
                                 {item?.description ||
                                   "No description available"}
                               </p>
@@ -205,11 +208,21 @@ const ProductList = () => {
                         </TableCell>
 
                         <TableCell className="font-medium">
-                          ₹{item?.actual_price || 0}
+                          ₹{mrp.toFixed(2)}
                         </TableCell>
 
                         <TableCell>
-                          {item?.discount_percentage || "0%"}
+                          <Badge
+                            variant="outline"
+                            className="rounded-full"
+                          >
+                            {discount}%
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <span className="font-semibold text-green-600">
+                            ₹{finalPrice.toFixed(2)}
+                          </span>
                         </TableCell>
 
                         <TableCell>{item?.stock || "—"}</TableCell>
@@ -299,9 +312,7 @@ const ProductList = () => {
                   variant="outline"
                   size="sm"
                   disabled={currentPage === 1}
-                  onClick={() =>
-                    setPage((prev) => prev - 1)
-                  }
+                  onClick={() => setPage((prev) => prev - 1)}
                 >
                   <ChevronLeft className="mr-1 h-4 w-4" />
                   Previous
@@ -311,9 +322,7 @@ const ProductList = () => {
                   variant="outline"
                   size="sm"
                   disabled={currentPage === totalPages}
-                  onClick={() =>
-                    setPage((prev) => prev + 1)
-                  }
+                  onClick={() => setPage((prev) => prev + 1)}
                 >
                   Next
                   <ChevronRight className="ml-1 h-4 w-4" />
